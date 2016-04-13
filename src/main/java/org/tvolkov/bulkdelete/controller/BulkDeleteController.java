@@ -6,17 +6,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.tvolkov.bulkdelete.service.BulkService;
+import org.tvolkov.bulkdelete.service.BulkDeleteService;
 
 @EnableWebMvc
 @RequestMapping ("/bulk")
 @Controller
 public class BulkDeleteController {
 
-    private BulkService bulkService;
+    private BulkDeleteService bulkDeleteService;
 
-    public BulkDeleteController(BulkService bulkService){
-        this.bulkService = bulkService;
+    public BulkDeleteController(BulkDeleteService bulkDeleteService){
+        this.bulkDeleteService = bulkDeleteService;
     }
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
@@ -26,7 +26,7 @@ public class BulkDeleteController {
 
     @RequestMapping(value = "/", method = RequestMethod.DELETE)
     public @ResponseBody String processBulkDelete(@RequestBody String body){
-        bulkService.deleteContentlets(body);
+        bulkDeleteService.deleteContentlets(body);
         return "ok";
     }
 }

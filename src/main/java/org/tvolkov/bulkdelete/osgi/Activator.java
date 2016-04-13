@@ -11,14 +11,11 @@ public class Activator extends GenericBundleActivator {
 
     @SuppressWarnings ("unchecked")
     public void start (BundleContext context) throws Exception {
-
-        //Initializing services...
         initializeServices(context);
 
         //Service reference to ExtHttpService that will allows to register servlets and filters
         ServiceReference sRef = context.getServiceReference(ExtHttpService.class.getName());
         if (sRef != null) {
-            //Publish bundle services
             publishBundleServices(context);
 
             ExtHttpService httpService = (ExtHttpService) context.getService(sRef);
@@ -35,7 +32,6 @@ public class Activator extends GenericBundleActivator {
 
     public void stop (BundleContext context) throws Exception {
         CMSFilter.removeExclude("/app/spring");
-        //Unpublish bundle services
         unregisterServices(context);
     }
 
