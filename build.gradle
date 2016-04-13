@@ -1,0 +1,70 @@
+group 'org.tvolkov'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'application'
+apply plugin: 'osgi'
+apply plugin: 'war'
+apply plugin: 'eclipse'
+apply plugin: 'java'
+
+sourceCompatibility = 1.7
+
+repositories {
+    mavenCentral()
+    maven {
+        url "http://repo.dotcms.com/artifactory/libs-release"
+    }
+}
+
+dependencies {
+    compile (group: 'com.dotcms', name: 'dotcms', version: '3.3.1'){
+        transitive = true
+    }
+    providedCompile "javax.servlet:servlet-api:2.5"
+    compile fileTree(dir: 'src/main/resources/libs', include: '*.jar')
+
+    compile 'org.slf4j:slf4j-simple:1.6.1'
+    compile 'org.json:json:20090211'
+//    providedCompile 'com.dotcms:dotcms:3.3.1'
+
+}
+
+jar {
+//    exclude('org/json/*')
+    manifest {
+        name = 'Dotcms bulk delete plugin'
+        symbolicName = 'org.tvolkov'
+        instruction 'Bundle-Vendor', 'Timofey Volkov'
+        instruction 'Bundle-Description', 'dotcms plugin which allows for bulk deleteing content via rest api'
+        instruction 'Bundle-DocURL', 'http://www.dotcms.com'
+        instruction 'Bundle-Activator', 'org.tvolkov.bulkdelete.osgi.Activator'
+        instruction 'DynamicImport-Package', '*'
+        instruction 'Import-Package', '*;version=0'
+//        instruction 'Import-Package',
+//                'org.json',
+//                'org.json,com.dotcms.repackage.org.apache.felix.http.api',
+//                'com.dotcms.repackage.org.osgi.framework',
+//                'com.dotcms.repackage.org.osgi.service.http',
+//                /*'com.dotmarketing.ss;version=0',*/
+//                'com.dotmarketing.filters',
+//                'com.dotmarketing.osgi',
+//                'com.dotmarketing.portlets.contentlet.business',
+//                'javax.servlet',
+//                'org.slf4j',
+//                'org.springframework.stereotype',
+//                'org.springframework.web.bind.annotation',
+//                'org.springframework.web.servlet',
+//                'org.springframework.web.servlet.config.annotation',
+//                'com.dotcms.repackage.org.json',
+//                '*;version=0'
+        instruction 'Export-Package', '*;version=0'
+    }
+}
+
+task install(type: Copy) {
+    from('build\\libs\\dotcms-bulk-delete-plugin-1.0-SNAPSHOT.jar')
+    into('C:\\Users\\tvolkov\\Downloads\\dotcms_3.3.1\\dotserver\\tomcat-8.0.18\\webapps\\ROOT\\WEB-INF\\felix\\load')
+}
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.8'
+}
