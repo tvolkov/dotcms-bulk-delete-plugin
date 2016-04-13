@@ -41,7 +41,7 @@ public class BulkDeleteService {
                 LOGGER.error("got exception: " + e.getMessage());
                 throw new RuntimeException(e);
             }
-            LOGGER.error("got json object: " + identifier);
+
             contentletDeleteProcessor.deleteContentlet(identifier);
         }
     }
