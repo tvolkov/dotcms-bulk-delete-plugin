@@ -25,12 +25,9 @@ dependencies {
 
     compile 'org.slf4j:slf4j-simple:1.6.1'
     compile 'org.json:json:20090211'
-//    providedCompile 'com.dotcms:dotcms:3.3.1'
-
 }
 
 jar {
-//    exclude('org/json/*')
     manifest {
         name = 'Dotcms bulk delete plugin'
         symbolicName = 'org.tvolkov'
@@ -40,23 +37,6 @@ jar {
         instruction 'Bundle-Activator', 'org.tvolkov.bulkdelete.osgi.Activator'
         instruction 'DynamicImport-Package', '*'
         instruction 'Import-Package', '*;version=0'
-//        instruction 'Import-Package',
-//                'org.json',
-//                'org.json,com.dotcms.repackage.org.apache.felix.http.api',
-//                'com.dotcms.repackage.org.osgi.framework',
-//                'com.dotcms.repackage.org.osgi.service.http',
-//                /*'com.dotmarketing.ss;version=0',*/
-//                'com.dotmarketing.filters',
-//                'com.dotmarketing.osgi',
-//                'com.dotmarketing.portlets.contentlet.business',
-//                'javax.servlet',
-//                'org.slf4j',
-//                'org.springframework.stereotype',
-//                'org.springframework.web.bind.annotation',
-//                'org.springframework.web.servlet',
-//                'org.springframework.web.servlet.config.annotation',
-//                'com.dotcms.repackage.org.json',
-//                '*;version=0'
         instruction 'Export-Package', '*;version=0'
     }
 }
