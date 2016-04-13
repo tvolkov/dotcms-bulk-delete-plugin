@@ -25,8 +25,8 @@ dependencies {
     compile 'org.slf4j:slf4j-simple:1.6.1'
     compile 'org.json:json:20090211'
 
-    compile 'junit:junit:4.12'
-    compile 'org.mockito:mockito-all:1.10.19'
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.mockito:mockito-all:1.10.19'
 }
 
 jar {
