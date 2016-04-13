@@ -1,0 +1,1 @@
+# dotcms-bulk-delete-plugin
