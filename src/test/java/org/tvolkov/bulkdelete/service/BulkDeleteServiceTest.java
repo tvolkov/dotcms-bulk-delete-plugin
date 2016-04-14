@@ -1,5 +1,6 @@
 package org.tvolkov.bulkdelete.service;
 
+import com.dotcms.repackage.edu.emory.mathcs.backport.java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -63,8 +64,8 @@ public class BulkDeleteServiceTest {
         bulkDeleteService.deleteContentlets(inputString);
 
         //then
-        verify(contentletDeleteProcessor).deleteContentlet("123");
-        verify(contentletDeleteProcessor).deleteContentlet("456");
+        String[] ids = {"123", "456"};
+        verify(contentletDeleteProcessor).deleteContentlets(Arrays.asList(ids));
     }
 
 }

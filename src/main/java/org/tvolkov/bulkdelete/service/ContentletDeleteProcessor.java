@@ -12,6 +12,7 @@ import com.liferay.portal.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 class ContentletDeleteProcessor {
@@ -23,60 +24,66 @@ class ContentletDeleteProcessor {
     private ContentletAPI contentApi  = APILocator.getContentletAPI();
     private UserAPI userApi       = APILocator.getUserAPI();
 
-    void deleteContentlet(String identifier){
-        String query = QUERY_TEMPLATE + identifier;
-        Contentlet contentlet = null;
-        User user = null;
+    void deleteContentlets(List<String> identifiers){
+        User user = getSystemUser();
+        List<Contentlet> contentlets = new ArrayList<>();
+        for (String identifier : identifiers){
+            contentlets.add(getContentletByIdentifier(identifier, user));
+        }
+
+        if (processBulkDelete(contentlets, user)){
+            LOGGER.info("contentlets were successfully deleted");
+        } else {
+            LOGGER.info("unable to remove some of the contentlets");
+        }
+    }
+
+    private Contentlet getContentletByIdentifier(String identifier, User user){
         LOGGER.info("looking up contentlet with identifier " + identifier);
+        String query = QUERY_TEMPLATE + identifier;
+        Contentlet contentlet;
         try {
-            user = userApi.getSystemUser();
             List<Contentlet> contentlets = contentApi.search(query, 1, 0, "modDate", user, false);
             if (contentlets.size() > 0){
                 LOGGER.info("Contentlets size = " + contentlets.size());
                 contentlet = contentlets.get(0);
             } else {
                 LOGGER.info("Contentlet with identifier " + identifier + " not found");
-                return;
+                return null;
             }
             LOGGER.info("Contentlet: " + contentlet.toString());
-
-        } catch (DotDataException e) {
-            e.printStackTrace();
-        } catch (DotSecurityException e) {
-            e.printStackTrace();
+        } catch (DotDataException | DotSecurityException e) {
+            throw new RuntimeException("Exception while getting contentlet with identifier " + identifier) ;
         }
+        return contentlet;
+    }
 
-        String fileInode = contentlet.getStringProperty("fileFieldVarName");
-        Contentlet fileContentlet = null;
-        String fileQuery = "+(inode:" + fileInode + " identifier:" + fileInode + ")";
+    private User getSystemUser(){
+        User user;
         try {
-            List<Contentlet> contentlets = contentApi.search(fileQuery, 1, 0, "modDate", user, false);
-            if (contentlets.size() > 0){
-                fileContentlet = contentlets.get(0);
-            } else {
-                LOGGER.error("File with identifier " + fileInode + " not found");
-                return;
-            }
+            user = userApi.getSystemUser();
         } catch (DotDataException e) {
-            e.printStackTrace();
-        } catch (DotSecurityException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Unable to get system user");
         }
+        return user;
+    }
 
+    private boolean processBulkDelete(List<Contentlet> contentlets, User user){
+        boolean result = false;
         try {
             HibernateUtil.startTransaction();
-            contentApi.delete(fileContentlet, user, false);
-            contentApi.delete(contentlet, user, false);
+            contentApi.unpublish(contentlets, user, false);
+            contentApi.archive(contentlets, user, false);
+            result = result || contentApi.delete(contentlets, user, false);
             HibernateUtil.commitTransaction();
         } catch (DotDataException | DotSecurityException e) {
-            LOGGER.error("exception while trying to delete contentlet with identifier " + identifier + ": " + e.getMessage());
+            LOGGER.error("exception while trying to delete contentlets: " + e.getMessage());
             try {
                 HibernateUtil.rollbackTransaction();
             } catch (DotHibernateException e1) {
                 LOGGER.error("unable to rollback transaction");
             }
-            return;
         }
-        LOGGER.info("contentlet with identifier " + identifier + " was successfully deleted");
+        return result;
     }
 }

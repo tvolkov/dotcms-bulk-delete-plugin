@@ -6,6 +6,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class BulkDeleteService {
 
@@ -33,6 +36,7 @@ public class BulkDeleteService {
             throw new RuntimeException("empty json array");
         }
         LOGGER.info("got json array: " + jsonArray.length());
+        List<String> identifiers = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++){
             String identifier;
             try {
@@ -41,8 +45,8 @@ public class BulkDeleteService {
                 LOGGER.error("got exception: " + e.getMessage());
                 throw new RuntimeException(e);
             }
-
-            contentletDeleteProcessor.deleteContentlet(identifier);
+            identifiers.add(identifier);
         }
+        contentletDeleteProcessor.deleteContentlets(identifiers);
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.web.servlet.DispatcherServlet;
 public class Activator extends GenericBundleActivator {
 
     @SuppressWarnings ("unchecked")
+    @Override
     public void start (BundleContext context) throws Exception {
         initializeServices(context);
 
@@ -30,6 +31,7 @@ public class Activator extends GenericBundleActivator {
         }
     }
 
+    @Override
     public void stop (BundleContext context) throws Exception {
         CMSFilter.removeExclude("/app/spring");
         unregisterServices(context);
