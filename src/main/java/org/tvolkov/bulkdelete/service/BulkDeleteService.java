@@ -21,6 +21,9 @@ public class BulkDeleteService {
     }
 
     public void deleteContentlets(String body){
+        if (body == null){
+            throw new IllegalArgumentException("body is null");
+        }
         LOGGER.info("parsing request body: " + body);
         JSONArray jsonArray;
         try {
@@ -28,12 +31,12 @@ public class BulkDeleteService {
             LOGGER.info(jsonArray.toString());
         } catch (JSONException e) {
             LOGGER.error("got exception: " + e.getMessage());
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException(e);
         }
 
         if (jsonArray.length() == 0) {
             LOGGER.error("empty json array");
-            throw new RuntimeException("empty json array");
+            throw new IllegalArgumentException("empty json array");
         }
         LOGGER.info("got json array: " + jsonArray.length());
         List<String> identifiers = new ArrayList<>();

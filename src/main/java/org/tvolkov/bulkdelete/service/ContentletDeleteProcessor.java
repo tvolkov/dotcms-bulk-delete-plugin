@@ -1,6 +1,5 @@
 package org.tvolkov.bulkdelete.service;
 
-import com.dotmarketing.business.APILocator;
 import com.dotmarketing.business.UserAPI;
 import com.dotmarketing.db.HibernateUtil;
 import com.dotmarketing.exception.DotDataException;
@@ -21,10 +20,18 @@ class ContentletDeleteProcessor {
 
     private static final String QUERY_TEMPLATE = "+identifier:";
 
-    private ContentletAPI contentApi  = APILocator.getContentletAPI();
-    private UserAPI userApi       = APILocator.getUserAPI();
+    private ContentletAPI contentletApi;
+    private UserAPI userApi;
+
+    public ContentletDeleteProcessor(ContentletAPI contentletApi, UserAPI userApi){
+        this.contentletApi = contentletApi;
+        this.userApi = userApi;
+    }
 
     void deleteContentlets(List<String> identifiers){
+        if (identifiers == null || identifiers.isEmpty()){
+            throw new IllegalArgumentException("Identifiers list is null or empty");
+        }
         User user = getSystemUser();
         List<Contentlet> contentlets = new ArrayList<>();
         for (String identifier : identifiers){
@@ -39,19 +46,18 @@ class ContentletDeleteProcessor {
     }
 
     private Contentlet getContentletByIdentifier(String identifier, User user){
-        LOGGER.info("looking up contentlet with identifier " + identifier);
+        LOGGER.debug("looking up contentlet with identifier " + identifier);
         String query = QUERY_TEMPLATE + identifier;
         Contentlet contentlet;
         try {
-            List<Contentlet> contentlets = contentApi.search(query, 1, 0, "modDate", user, false);
+            List<Contentlet> contentlets = contentletApi.search(query, 1, 0, "modDate", user, false);
             if (contentlets.size() > 0){
-                LOGGER.info("Contentlets size = " + contentlets.size());
                 contentlet = contentlets.get(0);
             } else {
                 LOGGER.info("Contentlet with identifier " + identifier + " not found");
-                return null;
+                throw new RuntimeException("Contentlet with identifier " + identifier + " not found");
             }
-            LOGGER.info("Contentlet: " + contentlet.toString());
+            LOGGER.debug("Contentlet: " + contentlet.toString());
         } catch (DotDataException | DotSecurityException e) {
             throw new RuntimeException("Exception while getting contentlet with identifier " + identifier) ;
         }
@@ -69,12 +75,12 @@ class ContentletDeleteProcessor {
     }
 
     private boolean processBulkDelete(List<Contentlet> contentlets, User user){
-        boolean result = false;
+        boolean result;
         try {
             HibernateUtil.startTransaction();
-            contentApi.unpublish(contentlets, user, false);
-            contentApi.archive(contentlets, user, false);
-            result = result || contentApi.delete(contentlets, user, false);
+            contentletApi.unpublish(contentlets, user, false);
+            contentletApi.archive(contentlets, user, false);
+            result = contentletApi.delete(contentlets, user, false);
             HibernateUtil.commitTransaction();
         } catch (DotDataException | DotSecurityException e) {
             LOGGER.error("exception while trying to delete contentlets: " + e.getMessage());
@@ -83,6 +89,7 @@ class ContentletDeleteProcessor {
             } catch (DotHibernateException e1) {
                 LOGGER.error("unable to rollback transaction");
             }
+            throw new RuntimeException("exception while trying to delete contentlets: " + e.getMessage());
         }
         return result;
     }

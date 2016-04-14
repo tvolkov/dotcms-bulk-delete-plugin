@@ -20,7 +20,7 @@ public class BulkDeleteServiceTest {
         this.bulkDeleteService = new BulkDeleteService(contentletDeleteProcessor);
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void shouldThrowAnExceptionIfInputStringIsNull(){
         //given
         String inputString = null;
@@ -28,7 +28,7 @@ public class BulkDeleteServiceTest {
         bulkDeleteService.deleteContentlets(inputString);
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void shouldThrowAnExceptionIfInputStringIsEmpty(){
         //given
         String inputString = "";
@@ -37,7 +37,7 @@ public class BulkDeleteServiceTest {
         bulkDeleteService.deleteContentlets(inputString);
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void shouldThrowAnExceptionIfInputStringIsNotAJsonArray(){
         //given
         String inputString = "1234";
@@ -46,7 +46,7 @@ public class BulkDeleteServiceTest {
         bulkDeleteService.deleteContentlets(inputString);
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void shouldThrowAnExceptionIfInputStringIsAJsonArrayOfZeroLength(){
         //given
         String inputString = "[]";
