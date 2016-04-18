@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.tvolkov.bulkdelete.exceptions.BodyParsingException;
 
 import static org.mockito.Mockito.verify;
 
@@ -20,7 +21,7 @@ public class BulkDeleteServiceTest {
         this.bulkDeleteService = new BulkDeleteService(contentletDeleteProcessor);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = BodyParsingException.class)
     public void shouldThrowAnExceptionIfInputStringIsNull(){
         //given
         String inputString = null;
@@ -28,7 +29,7 @@ public class BulkDeleteServiceTest {
         bulkDeleteService.deleteContentlets(inputString);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = BodyParsingException.class)
     public void shouldThrowAnExceptionIfInputStringIsEmpty(){
         //given
         String inputString = "";
@@ -37,7 +38,7 @@ public class BulkDeleteServiceTest {
         bulkDeleteService.deleteContentlets(inputString);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = BodyParsingException.class)
     public void shouldThrowAnExceptionIfInputStringIsNotAJsonArray(){
         //given
         String inputString = "1234";
@@ -46,7 +47,7 @@ public class BulkDeleteServiceTest {
         bulkDeleteService.deleteContentlets(inputString);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = BodyParsingException.class)
     public void shouldThrowAnExceptionIfInputStringIsAJsonArrayOfZeroLength(){
         //given
         String inputString = "[]";

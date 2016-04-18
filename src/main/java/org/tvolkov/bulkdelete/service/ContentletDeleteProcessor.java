@@ -10,6 +10,9 @@ import com.dotmarketing.portlets.contentlet.model.Contentlet;
 import com.liferay.portal.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tvolkov.bulkdelete.exceptions.ContentletNotFoundException;
+import org.tvolkov.bulkdelete.exceptions.InternalServerError;
+import org.tvolkov.bulkdelete.exceptions.NoIdentifiersException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,9 +31,9 @@ class ContentletDeleteProcessor {
         this.userApi = userApi;
     }
 
-    void deleteContentlets(List<String> identifiers){
+    boolean deleteContentlets(List<String> identifiers){
         if (identifiers == null || identifiers.isEmpty()){
-            throw new IllegalArgumentException("Identifiers list is null or empty");
+            throw new NoIdentifiersException();
         }
         User user = getSystemUser();
         List<Contentlet> contentlets = new ArrayList<>();
@@ -38,11 +41,7 @@ class ContentletDeleteProcessor {
             contentlets.add(getContentletByIdentifier(identifier, user));
         }
 
-        if (processBulkDelete(contentlets, user)){
-            LOGGER.info("contentlets were successfully deleted");
-        } else {
-            LOGGER.info("unable to remove some of the contentlets");
-        }
+        return processBulkDelete(contentlets, user);
     }
 
     private Contentlet getContentletByIdentifier(String identifier, User user){
@@ -55,11 +54,12 @@ class ContentletDeleteProcessor {
                 contentlet = contentlets.get(0);
             } else {
                 LOGGER.info("Contentlet with identifier " + identifier + " not found");
-                throw new RuntimeException("Contentlet with identifier " + identifier + " not found");
+                throw new ContentletNotFoundException();
             }
             LOGGER.debug("Contentlet: " + contentlet.toString());
         } catch (DotDataException | DotSecurityException e) {
-            throw new RuntimeException("Exception while getting contentlet with identifier " + identifier) ;
+            LOGGER.info("Exception while getting contentlet with identifier " + identifier);
+            throw new InternalServerError() ;
         }
         return contentlet;
     }
@@ -89,7 +89,8 @@ class ContentletDeleteProcessor {
             } catch (DotHibernateException e1) {
                 LOGGER.error("unable to rollback transaction");
             }
-            throw new RuntimeException("exception while trying to delete contentlets: " + e.getMessage());
+            LOGGER.info("exception while trying to delete contentlets: " + e.getMessage());
+            throw new InternalServerError();
         }
         return result;
     }

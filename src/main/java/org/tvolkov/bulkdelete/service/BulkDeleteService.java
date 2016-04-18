@@ -5,6 +5,7 @@ import com.dotcms.repackage.org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.tvolkov.bulkdelete.exceptions.BodyParsingException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,9 +21,9 @@ public class BulkDeleteService {
         this.contentletDeleteProcessor = contentletDeleteProcessor;
     }
 
-    public void deleteContentlets(String body){
+    public boolean deleteContentlets(String body){
         if (body == null){
-            throw new IllegalArgumentException("body is null");
+            throw new BodyParsingException();
         }
         LOGGER.info("parsing request body: " + body);
         JSONArray jsonArray;
@@ -31,14 +32,13 @@ public class BulkDeleteService {
             LOGGER.info(jsonArray.toString());
         } catch (JSONException e) {
             LOGGER.error("got exception: " + e.getMessage());
-            throw new IllegalArgumentException(e);
+            throw new BodyParsingException(e);
         }
 
         if (jsonArray.length() == 0) {
             LOGGER.error("empty json array");
-            throw new IllegalArgumentException("empty json array");
+            throw new BodyParsingException();
         }
-        LOGGER.info("got json array: " + jsonArray.length());
         List<String> identifiers = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++){
             String identifier;
@@ -46,10 +46,10 @@ public class BulkDeleteService {
                 identifier = jsonArray.getString(i);
             } catch (JSONException e) {
                 LOGGER.error("got exception: " + e.getMessage());
-                throw new RuntimeException(e);
+                throw new BodyParsingException(e);
             }
             identifiers.add(identifier);
         }
-        contentletDeleteProcessor.deleteContentlets(identifiers);
+        return contentletDeleteProcessor.deleteContentlets(identifiers);
     }
 }

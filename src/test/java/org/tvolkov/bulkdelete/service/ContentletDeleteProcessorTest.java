@@ -17,6 +17,7 @@ import org.mockito.Mock;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.tvolkov.bulkdelete.exceptions.NoIdentifiersException;
 
 import java.util.List;
 
@@ -41,13 +42,13 @@ public class ContentletDeleteProcessorTest {
         this.contentletDeleteProcessor = new ContentletDeleteProcessor(contentletAPI, userAPI);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NoIdentifiersException.class)
     public void shouldThrowAnExceptionIfIdentifiersListIsNull(){
         //when
         this.contentletDeleteProcessor.deleteContentlets(null);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NoIdentifiersException.class)
     public void shouldThrowAnExceptionIfIdentifiersListIsEmpty(){
         //when
         this.contentletDeleteProcessor.deleteContentlets(Collections.emptyList());
