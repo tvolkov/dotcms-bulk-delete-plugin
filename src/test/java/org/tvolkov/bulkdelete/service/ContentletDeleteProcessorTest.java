@@ -2,7 +2,6 @@ package org.tvolkov.bulkdelete.service;
 
 import com.dotcms.repackage.edu.emory.mathcs.backport.java.util.Arrays;
 import com.dotcms.repackage.edu.emory.mathcs.backport.java.util.Collections;
-import com.dotcms.repackage.net.sf.hibernate.Hibernate;
 import com.dotmarketing.business.UserAPI;
 import com.dotmarketing.db.HibernateUtil;
 import com.dotmarketing.exception.DotDataException;
