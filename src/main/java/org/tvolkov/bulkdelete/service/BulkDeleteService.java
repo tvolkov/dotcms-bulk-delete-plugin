@@ -25,7 +25,6 @@ public class BulkDeleteService {
         if (body == null){
             throw new BodyParsingException();
         }
-        LOGGER.info("parsing request body: " + body);
         JSONArray jsonArray;
         try {
             jsonArray = new JSONArray(body);
